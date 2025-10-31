@@ -11,9 +11,9 @@ const app = express();
 app.use(express.json()); // Parse JSON
 
 app.use(cors({
-  origin: "http://localhost:5173", // your frontend origin
+  origin: "http://localhost:5173", 
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true, // optional if you use cookies/auth
+  credentials: true, 
 }));
 
 // Routes
