@@ -7,6 +7,9 @@ import About from "../pages/About.jsx";
 import Contact from "../pages/Contact.jsx";
 import Layout from "../components/Layout.jsx";
 import Dashboard from "../pages/Dashboard.jsx"; 
+import AddCity from "../pages/AddCity.jsx";
+import AllCities from "../pages/AllCities.jsx";
+
 
 const UserRoutes = () => {
   return (
@@ -56,8 +59,29 @@ const UserRoutes = () => {
      <Route 
         id="6" 
         path="/dashboard" 
-        element={<Dashboard/>}
+        element={
+        <Layout>
+        <Dashboard/>
+        </Layout>}
      />
+
+       <Route 
+        id="7" 
+        path="/add-city" 
+        element={
+        <Layout>
+        <AddCity/>    
+        </Layout>}
+     />
+
+       <Route 
+        id="8" 
+        path="/all-cities" 
+        element={<Layout>
+        <AllCities/>    
+        </Layout>}
+     />
+       
       <Route 
       path="*"
       element={<Navigate to="/" replace />} />
