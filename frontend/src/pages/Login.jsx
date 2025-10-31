@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -105,9 +106,9 @@ const Login = () => {
         {/* Footer */}
         <p className="text-center text-sm text-gray-600 mt-6">
           Don’t have an account?{" "}
-          <a href="/signup" className="text-sky-600 font-semibold hover:underline">
-            Sign up
-          </a>
+          <Link to="/signup" className="text-sky-600 font-semibold hover:underline">
+           Sign up
+          </Link>
         </p>
       </div>
     </div>

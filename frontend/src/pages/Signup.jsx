@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { FaUserAlt, FaEnvelope, FaLock } from "react-icons/fa"; // ✅ Added icons
+import { FaUserAlt, FaEnvelope, FaLock } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -26,12 +27,27 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      // Simulate backend API call
-      await new Promise((res) => setTimeout(res, 1500));
+      // ✅ Connect to backend API
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Signup failed!");
+      }
+
       toast.success("Signup successful! 🎉 Welcome to Weather Tracking App");
+
+      // Reset form
       setFormData({ name: "", email: "", password: "" });
     } catch (error) {
-      toast.error("Something went wrong! Please try again.");
+      toast.error(error.message || "Something went wrong! Please try again.");
     } finally {
       setLoading(false);
     }
@@ -123,9 +139,9 @@ const Signup = () => {
         {/* Footer */}
         <p className="text-center text-sm text-gray-600 mt-6">
           Already have an account?{" "}
-          <a href="/login" className="text-sky-600 font-semibold hover:underline">
-            Log in
-          </a>
+          <Link to="/login" className="text-sky-600 font-semibold hover:underline">
+            Login
+          </Link>
         </p>
       </div>
     </div>

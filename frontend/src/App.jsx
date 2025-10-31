@@ -1,12 +1,10 @@
-import Signup from "./pages/Signup";
-import Login from "./pages/Login";
-
+import { BrowserRouter } from "react-router-dom";
+import UserRoutes from "./routes/UserRoutes.jsx";
 function App() {
   return (
-   <div>
-    {/* <Signup /> */}
-    <Login />
-   </div>
+   <BrowserRouter>
+    <UserRoutes />
+   </BrowserRouter>
   );
 }
 export default App
