@@ -6,7 +6,7 @@ import Home from "../pages/Home.jsx";
 import About from "../pages/About.jsx";
 import Contact from "../pages/Contact.jsx";
 import Layout from "../components/Layout.jsx";
-import Dashboard from "../pages/Dashboard.jsx";
+import Dashboard from "../pages/Dashboard.jsx"; 
 
 const UserRoutes = () => {
   return (

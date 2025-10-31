@@ -4,7 +4,7 @@ const {
   addCity,
   deleteCity,
   getWeatherByCity,
-} = require("../controllers/weatherController.js");
+} = require("../controller/weatherController.js");
 
 const router = express.Router();
 

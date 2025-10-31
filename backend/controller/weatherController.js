@@ -1,4 +1,4 @@
-const City = require("../models/City.js");
+const City = require("../model/City.js");
 const { fetchWeatherData } = require("../utils/fetchWeather.js");
 
 // GET /api/cities

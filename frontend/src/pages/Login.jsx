@@ -51,7 +51,7 @@ const Login = () => {
 
       // ✅ Redirect to dashboard or home
       setTimeout(() => {
-        navigate("/");
+        navigate("/dashboard");
       }, 1500);
 
       // Reset form

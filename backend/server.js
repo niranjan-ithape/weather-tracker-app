@@ -4,6 +4,7 @@ const cors = require("cors");
 const cron = require("node-cron");
 const connectDB = require("./config/db.js");
 const authRoutes = require("./routes/authRoute.js");
+const weatherRoutes = require("./routes/weatherRoutes.js");
 const City = require("./model/City.js");
 const { fetchWeatherData } = require("./utils/fetchWeather.js");
 
@@ -28,6 +29,7 @@ app.use(
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/weather", weatherRoutes);
 
 // Scheduled Cron Job (Every Hour)
 cron.schedule("0 * * * *", async () => {
