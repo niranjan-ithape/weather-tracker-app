@@ -6,6 +6,7 @@ import Home from "../pages/Home.jsx";
 import About from "../pages/About.jsx";
 import Contact from "../pages/Contact.jsx";
 import Layout from "../components/Layout.jsx";
+import Dashboard from "../pages/Dashboard.jsx";
 
 const UserRoutes = () => {
   return (
@@ -50,6 +51,12 @@ const UserRoutes = () => {
         id="5" 
         path="/signup" 
         element={<Signup />}
+     />
+
+     <Route 
+        id="6" 
+        path="/dashboard" 
+        element={<Dashboard/>}
      />
       <Route 
       path="*"
