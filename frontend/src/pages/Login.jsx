@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaEnvelope, FaLock } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +10,7 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // ✅ for redirecting after login
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,13 +27,37 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Simulate API call (replace with real backend later)
-      await new Promise((res) => setTimeout(res, 1500));
+      // ✅ Real API call to backend
+      const response = await fetch("http://localhost:5000/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid credentials");
+      }
 
       toast.success("Login successful! 🌤️ Welcome back to Weather Tracking App");
+
+      // ✅ Optional: Save token in localStorage
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      // ✅ Redirect to dashboard or home
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+
+      // Reset form
       setFormData({ email: "", password: "" });
     } catch (error) {
-      toast.error("Invalid credentials. Please try again.");
+      toast.error(error.message || "Login failed! Please try again.");
     } finally {
       setLoading(false);
     }
@@ -107,7 +132,7 @@ const Login = () => {
         <p className="text-center text-sm text-gray-600 mt-6">
           Don’t have an account?{" "}
           <Link to="/signup" className="text-sky-600 font-semibold hover:underline">
-           Sign up
+            Sign up
           </Link>
         </p>
       </div>
