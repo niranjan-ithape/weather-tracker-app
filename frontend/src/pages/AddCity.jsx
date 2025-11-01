@@ -1,24 +1,15 @@
 // pages/AddCity.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import debounce from "lodash/debounce";
 import { PlusCircle, Search, Cloud, Sun, CloudRain } from "lucide-react";
-
-const CITY_SUGGESTIONS = [
-  { name: "Mumbai", country: "India", temp: 32, condition: "sunny" },
-  { name: "Delhi", country: "India", temp: 28, condition: "cloudy" },
-  { name: "Bangalore", country: "India", temp: 26, condition: "rainy" },
-  { name: "Chennai", country: "India", temp: 34, condition: "sunny" },
-  { name: "Kolkata", country: "India", temp: 30, condition: "cloudy" },
-  { name: "Hyderabad", country: "India", temp: 29, condition: "sunny" },
-  { name: "Pune", country: "India", temp: 27, condition: "rainy" },
-  { name: "Jaipur", country: "India", temp: 31, condition: "sunny" },
-];
 
 const icon = (cond) =>
   ({
     sunny: <Sun className="text-yellow-500" size={20} />,
     rainy: <CloudRain className="text-blue-400" size={20} />,
     cloudy: <Cloud className="text-gray-400" size={20} />,
-  }[cond] || <Cloud className="text-gray-400" size={20} />);
+    mist: <Cloud className="text-gray-300" size={20} />,
+  }[cond?.toLowerCase()] || <Cloud className="text-gray-400" size={20} />);
 
 export default function AddCity() {
   const [city, setCity] = useState("");
@@ -28,15 +19,35 @@ export default function AddCity() {
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Filter suggestions
-  useEffect(() => {
-    const q = city.trim().toLowerCase();
-    setSuggestions(
-      q ? CITY_SUGGESTIONS.filter((c) => c.name.toLowerCase().includes(q)) : []
-    );
-  }, [city]);
+  // ✅ Debounced fetch for dynamic city suggestions
+  const fetchSuggestions = async (query) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
 
-  // Close dropdown when clicking outside
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/weather/cities/suggest?s=${query}`
+      );
+      const data = await res.json();
+      setSuggestions(data || []);
+    } catch (err) {
+      console.error("Error fetching suggestions:", err);
+    }
+  };
+
+  const debouncedFetch = useCallback(debounce(fetchSuggestions, 300), []);
+
+  useEffect(() => {
+    if (city.trim()) {
+      debouncedFetch(city);
+    } else {
+      setSuggestions([]);
+    }
+  }, [city, debouncedFetch]);
+
+  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -51,23 +62,41 @@ export default function AddCity() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Add city
+  // ✅ Add city (API integration)
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!city.trim()) {
       setMsg({ type: "err", text: "Please enter a city name" });
       return;
     }
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200)); // simulate API
-    setMsg({ type: "ok", text: `City "${city}" added successfully!` });
-    setCity("");
-    setSuggestions([]);
-    setLoading(false);
-    setTimeout(() => setMsg(null), 2500);
+
+    try {
+      setLoading(true);
+      const res = await fetch("http://localhost:5000/api/weather/cities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: city }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMsg({ type: "ok", text: `City "${city}" added successfully!` });
+      } else {
+        setMsg({ type: "err", text: data.message || "Failed to add city" });
+      }
+    } catch (error) {
+      console.error("Error adding city:", error);
+      setMsg({ type: "err", text: "Server error. Please try again." });
+    } finally {
+      setLoading(false);
+      setCity("");
+      setSuggestions([]);
+      setTimeout(() => setMsg(null), 2500);
+    }
   };
 
-  // Handle select (single click only)
+  // ✅ Handle select (single click only)
   const handleSelect = (name) => {
     setCity(name);
     setSuggestions([]);
@@ -76,7 +105,6 @@ export default function AddCity() {
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-slate-900 to-blue-900 text-white flex items-center justify-center px-4 select-none">
       <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-xl border border-white/20 animate-fade-in">
-        
         {/* Header */}
         <div className="text-center mb-8">
           <PlusCircle
@@ -109,7 +137,7 @@ export default function AddCity() {
                   <div
                     key={i}
                     onClick={() => handleSelect(s.name)}
-                    onMouseDown={(e) => e.preventDefault()} // 🧩 Prevents text select / double click issues
+                    onMouseDown={(e) => e.preventDefault()}
                     className="flex justify-between items-center px-4 py-3 hover:bg-blue-50 cursor-pointer transition"
                   >
                     <div className="flex items-center gap-2">
@@ -119,7 +147,9 @@ export default function AddCity() {
                         <p className="text-xs text-gray-500">{s.country}</p>
                       </div>
                     </div>
-                    <span className="text-sm text-gray-700">{s.temp}°C</span>
+                    <span className="text-sm text-gray-700">
+                      {s.temperature?.toFixed(1)}°C
+                    </span>
                   </div>
                 ))}
               </div>

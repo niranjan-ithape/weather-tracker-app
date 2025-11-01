@@ -1,28 +1,48 @@
-import CityDetails from "../components/CityDetails"; // ✅ new import
+import CityDetails from "../components/CityDetails";
 import React, { useState, useEffect } from "react";
-import {Search,Trash2, Cloud,Sun,CloudRain,Wind,MapPin,Thermometer,Filter,Eye,
+import {
+  Search,
+  Trash2,
+  Cloud,
+  Sun,
+  CloudRain,
+  Wind,
+  MapPin,
+  Thermometer,
+  Filter,
+  Eye,
 } from "lucide-react";
 
-const initial = [
-  { id: 1, name: "Delhi", temp: 38, cond: "Sunny", humidity: 45, wind: 12 },
-  { id: 2, name: "Mumbai", temp: 31, cond: "Cloudy", humidity: 78, wind: 18 },
-  { id: 3, name: "Shimla", temp: 15, cond: "Rainy", humidity: 92, wind: 8 },
-  { id: 4, name: "Bangalore", temp: 26, cond: "Cloudy", humidity: 65, wind: 14 },
-  { id: 5, name: "Chennai", temp: 35, cond: "Sunny", humidity: 70, wind: 16 },
-  { id: 6, name: "Kolkata", temp: 33, cond: "Humid", humidity: 85, wind: 10 },
-  { id: 7, name: "Jaipur", temp: 40, cond: "Sunny", humidity: 35, wind: 20 },
-  { id: 8, name: "Hyderabad", temp: 29, cond: "Partly Cloudy", humidity: 60, wind: 15 },
-];
-
 export default function AllCities() {
-  const [cities, setCities] = useState(initial);
+  const [cities, setCities] = useState([]);
+  const [filteredCities, setFilteredCities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredCities, setFilteredCities] = useState(initial);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [weatherFilter, setWeatherFilter] = useState("all");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedCity, setSelectedCity] = useState(null);
 
-  // Filter cities
+  // ✅ Fetch data from backend API
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/weather/cities");
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          setCities(data);
+          setFilteredCities(data);
+        } else {
+          console.error("Unexpected API response:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+
+    fetchCities();
+  }, []);
+
+  // ✅ Filter cities by search or condition
   useEffect(() => {
     let result = cities;
 
@@ -34,14 +54,14 @@ export default function AllCities() {
 
     if (weatherFilter !== "all") {
       result = result.filter((city) =>
-        city.cond.toLowerCase().includes(weatherFilter.toLowerCase())
+        city.condition.toLowerCase().includes(weatherFilter.toLowerCase())
       );
     }
 
     setFilteredCities(result);
-  }, [searchTerm, cities, weatherFilter]);
+  }, [searchTerm, weatherFilter, cities]);
 
-  // Sort cities
+  // ✅ Sort cities
   useEffect(() => {
     if (sortConfig.key) {
       const sorted = [...filteredCities].sort((a, b) => {
@@ -55,8 +75,7 @@ export default function AllCities() {
     }
   }, [sortConfig]);
 
-  const remove = (id) => setCities((s) => s.filter((c) => c.id !== id));
-
+  // ✅ Handle sort click
   const handleSort = (key) => {
     setSortConfig({
       key,
@@ -67,23 +86,32 @@ export default function AllCities() {
     });
   };
 
+  // ✅ Remove city (only frontend removal)
+  const removeCity = (id) => setCities((prev) => prev.filter((c) => c._id !== id));
+
+  // ✅ Get weather icon
   const getWeatherIcon = (condition) => {
+    if (!condition) return <Cloud className="text-gray-400" size={20} />;
     switch (condition.toLowerCase()) {
       case "sunny":
+      case "clear":
         return <Sun className="text-yellow-500" size={20} />;
       case "rainy":
+      case "rain":
         return <CloudRain className="text-blue-500" size={20} />;
+      case "clouds":
       case "cloudy":
         return <Cloud className="text-gray-500" size={20} />;
-      case "humid":
+      case "haze":
+      case "mist":
+      case "smoke":
         return <Wind className="text-green-500" size={20} />;
-      case "partly cloudy":
-        return <Cloud className="text-gray-400" size={20} />;
       default:
         return <Cloud className="text-gray-400" size={20} />;
     }
   };
 
+  // ✅ Temperature color
   const getTempColor = (temp) => {
     if (temp >= 35) return "text-red-600";
     if (temp >= 25) return "text-orange-500";
@@ -91,7 +119,15 @@ export default function AllCities() {
     return "text-blue-500";
   };
 
-  const weatherConditions = ["all", "sunny", "cloudy", "rainy", "humid", "partly cloudy"];
+  const weatherConditions = [
+    "all",
+    "sunny",
+    "clouds",
+    "rainy",
+    "haze",
+    "mist",
+    "smoke",
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#c9e5ff]/80 to-[#f7faff]/70 py-8 px-4">
@@ -107,9 +143,7 @@ export default function AllCities() {
           <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
             Weather Dashboard
           </h2>
-          <p className="text-gray-600">
-            Track and manage all your cities' weather data
-          </p>
+          <p className="text-gray-600">Track and manage all your cities' weather data</p>
         </div>
 
         {/* Search & Filter */}
@@ -117,10 +151,7 @@ export default function AllCities() {
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
             <div className="relative flex-1 w-full">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
                 placeholder="Search cities..."
@@ -159,10 +190,7 @@ export default function AllCities() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-gray-200">
-                  <th
-                    onClick={() => handleSort("name")}
-                    className="px-6 py-4 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors duration-200"
-                  >
+                  <th onClick={() => handleSort("name")} className="px-6 py-4 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors duration-200">
                     <div className="flex items-center gap-2">
                       <MapPin size={16} /> City{" "}
                       {sortConfig.key === "name" && (
@@ -179,13 +207,10 @@ export default function AllCities() {
                     </div>
                   </th>
 
-                  <th
-                    onClick={() => handleSort("temp")}
-                    className="px-6 py-4 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors duration-200"
-                  >
+                  <th onClick={() => handleSort("temperature")} className="px-6 py-4 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors duration-200">
                     <div className="flex items-center gap-2">
                       <Thermometer size={16} /> Temperature{" "}
-                      {sortConfig.key === "temp" && (
+                      {sortConfig.key === "temperature" && (
                         <span className="text-blue-500">
                           {sortConfig.direction === "asc" ? "↑" : "↓"}
                         </span>
@@ -208,7 +233,7 @@ export default function AllCities() {
               <tbody>
                 {filteredCities.map((city, index) => (
                   <tr
-                    key={city.id}
+                    key={city._id}
                     className="border-b border-gray-100 hover:bg-blue-50/50 transition-all duration-300 animate-fade-in"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
@@ -219,21 +244,21 @@ export default function AllCities() {
                         </div>
                         <div>
                           <div className="font-semibold text-gray-900">{city.name}</div>
-                          <div className="text-xs text-gray-500">India</div>
+                          <div className="text-xs text-gray-500">{city.country}</div>
                         </div>
                       </div>
                     </td>
 
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {getWeatherIcon(city.cond)}
-                        <span className="font-medium text-gray-700">{city.cond}</span>
+                        {getWeatherIcon(city.condition)}
+                        <span className="font-medium text-gray-700">{city.condition}</span>
                       </div>
                     </td>
 
                     <td className="px-6 py-4">
-                      <div className={`text-xl font-bold ${getTempColor(city.temp)}`}>
-                        {city.temp}°C
+                      <div className={`text-xl font-bold ${getTempColor(city.temperature)}`}>
+                        {city.temperature.toFixed(1)}°C
                       </div>
                     </td>
 
@@ -250,7 +275,7 @@ export default function AllCities() {
 
                     <td className="px-6 py-4">
                       <button
-                        onClick={() => remove(city.id)}
+                        onClick={() => removeCity(city._id)}
                         className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-105 border border-red-200 hover:border-red-300"
                       >
                         <Trash2 size={16} /> Remove
@@ -281,17 +306,14 @@ export default function AllCities() {
       <div className="fixed top-10 right-10 opacity-20 animate-float">
         <Cloud size={80} className="text-blue-400" />
       </div>
-      <div
-        className="fixed bottom-20 left-10 opacity-20 animate-float"
-        style={{ animationDelay: "2s" }}
-      >
+      <div className="fixed bottom-20 left-10 opacity-20 animate-float" style={{ animationDelay: "2s" }}>
         <Sun size={60} className="text-yellow-400" />
       </div>
 
-      {/* ✅ CityDetails Modal - Fixed */}
+      {/* ✅ City Details Modal */}
       {selectedCity && (
-        <CityDetails 
-          city={selectedCity} 
+        <CityDetails
+          city={selectedCity}
           onClose={() => setSelectedCity(null)}
           getWeatherIcon={getWeatherIcon}
         />
