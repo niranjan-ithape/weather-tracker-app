@@ -8,7 +8,7 @@ const Home = () => {
 return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 via-sky-400 to-indigo-500 text-white flex flex-col">
       
-      {/* STATIC NAVBAR ADDED */}
+    
       <Navbar />
 
       {/* ---------- HERO SECTION ---------- */}

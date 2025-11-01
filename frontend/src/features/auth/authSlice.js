@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authService from "./authService";
 
-// ✅ Safely read and parse user from localStorage
+//Safely read and parse user from localStorage
 let storedUser = null;
 try {
   const userData = localStorage.getItem("user");
@@ -15,7 +15,7 @@ try {
 
 const storedToken = localStorage.getItem("token") || null;
 
-// ✅ Initial state
+//Initial state
 const initialState = {
   user: storedUser,
   token: storedToken,
@@ -25,7 +25,7 @@ const initialState = {
   message: "",
 };
 
-// ✅ Async thunk for login
+//Async thunk for login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (userData, thunkAPI) => {
@@ -39,12 +39,12 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// ✅ Slice definition
+//Slice definition
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // ✅ Logout clears everything
+    //Logout clears everything
     logout: (state) => {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
@@ -58,19 +58,19 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ✅ Login pending
+      //Login pending
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
         state.message = "";
       })
 
-      // ✅ Login success
+      //Login success
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
 
-        // Normalize response
+        //Normalize response
         const user = action.payload.user || {
           _id: action.payload._id,
           name: action.payload.name,
@@ -80,14 +80,14 @@ const authSlice = createSlice({
         state.user = user;
         state.token = action.payload.token || null;
 
-        // ✅ Save to localStorage
+        //Save to localStorage
         if (state.token) {
           localStorage.setItem("token", state.token);
           localStorage.setItem("user", JSON.stringify(user));
         }
       })
 
-      // ✅ Login failure
+      //Login failure
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
@@ -99,6 +99,6 @@ const authSlice = createSlice({
   },
 });
 
-// ✅ Export actions and reducer
+//Export actions and reducer
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,17 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Search,
-  Trash2,
-  Cloud,
-  Sun,
-  CloudRain,
-  Wind,
-  MapPin,
-  Thermometer,
-  Filter,
-  Eye,
-} from "lucide-react";
+import {Search,Trash2,Cloud,Sun,CloudRain,Wind,MapPin,Thermometer,Filter,Eye,} from "lucide-react";
 
 export default function AllCities() {
   const [cities, setCities] = useState([]);

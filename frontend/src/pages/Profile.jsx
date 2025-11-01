@@ -2,7 +2,7 @@
 import React from "react";
 import { LogOut, User } from "lucide-react";
 import { useDispatch,useSelector } from "react-redux";
-import { logout } from "../features/auth/authSlice"; // make sure you have this action
+import { logout } from "../features/auth/authSlice"; 
 import { useNavigate } from "react-router-dom";
 
 
