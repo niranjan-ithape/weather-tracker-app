@@ -52,7 +52,7 @@ const Profile = () => {
             opacity: 1;
             transform: translateY(0);
           }
-        }
+        }   
         .animate-fade-in {
           animation: fadeIn 0.4s ease-out;
         }

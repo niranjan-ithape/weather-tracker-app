@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../features/auth/authSlice"; // ✅ import redux action
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,13 +12,14 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const dispatch = useDispatch(); // ✅ Redux dispatcher
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
@@ -27,41 +30,24 @@ const handleSubmit = async (e) => {
     setLoading(true);
 
     try {
-      //Real API call to backend
-      const response = await fetch("http://localhost:5000/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      // ✅ Dispatch redux action instead of manual fetch
+      const resultAction = await dispatch(loginUser(formData));
 
-      const data = await response.json();
+      if (loginUser.fulfilled.match(resultAction)) {
+        toast.success("Login successful! 🌤️ Welcome back to Weather Tracking App");
 
-      if (!response.ok) {
-        throw new Error(data.message || "Invalid credentials");
+        // Redux slice automatically saves token & user to store + localStorage
+        setTimeout(() => navigate("/dashboard"), 1500);
+        setFormData({ email: "", password: "" });
+      } else {
+        throw new Error(resultAction.payload || "Invalid credentials");
       }
-
-      toast.success("Login successful! 🌤️ Welcome back to Weather Tracking App");
-
-      //Optional: Save token in localStorage
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
-
-      //Redirect to dashboard or home
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
-
-      //Reset form
-      setFormData({ email: "", password: "" });
     } catch (error) {
       toast.error(error.message || "Login failed! Please try again.");
     } finally {
       setLoading(false);
     }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 p-6 sm:p-10">
@@ -80,7 +66,9 @@ const handleSubmit = async (e) => {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
             <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-sky-400">
               <span className="px-3 text-sky-600 text-lg">
                 <FaEnvelope />
@@ -98,7 +86,9 @@ const handleSubmit = async (e) => {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
             <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-sky-400">
               <span className="px-3 text-sky-600 text-lg">
                 <FaLock />
@@ -131,7 +121,10 @@ const handleSubmit = async (e) => {
         {/* Footer */}
         <p className="text-center text-sm text-gray-600 mt-6">
           Don’t have an account?{" "}
-          <Link to="/signup" className="text-sky-600 font-semibold hover:underline">
+          <Link
+            to="/signup"
+            className="text-sky-600 font-semibold hover:underline"
+          >
             Sign up
           </Link>
         </p>

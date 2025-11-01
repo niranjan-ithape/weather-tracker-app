@@ -20,8 +20,7 @@ export default function AddCity() {
   const [suggestions, setSuggestions] = useState([]);
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
-  const token = useSelector((state) => state.auth.user?.token);
-  console.log(token);
+  const token = localStorage.getItem("token");
   
 
   const fetchSuggestions = async (query) => {

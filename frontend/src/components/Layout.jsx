@@ -5,19 +5,25 @@ import Sidebar from "./Sidebar.jsx";
 
 
 const Layout = ({ children }) => {
-  const token =localStorage.getItem("token");
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  console.log(token);
-  
-  
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
 //Sidebar routes where you want sidebar + dashboard layout
   const sidebarRoutes = ["/dashboard", "/add-city", "/all-cities", "/profile"];
   const isSidebarPage = sidebarRoutes.includes(location.pathname);
 
-//Automatically check login when token changes
-const isLoggedIn =token;
+useEffect(() => {
+  const handleStorageChange = () => {
+    setToken(localStorage.getItem("token"));
+  };
+  window.addEventListener("storage", handleStorageChange);
+  return () => window.removeEventListener("storage", handleStorageChange);
+}, []);
+
+
+const isLoggedIn = Boolean(token);
+
 
 if (isLoggedIn && isSidebarPage) {
     return (

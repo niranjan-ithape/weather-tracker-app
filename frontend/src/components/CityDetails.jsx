@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {X,Droplets,Wind,Gauge,Sun,Eye,Navigation,} from "lucide-react";
-import { useSelector } from "react-redux";
+;
 
 const CityDetails = ({ getWeatherIcon }) => {
   const { cityName } = useParams();
@@ -11,7 +11,7 @@ const CityDetails = ({ getWeatherIcon }) => {
   const [error, setError] = useState(null);
   const [closing, setClosing] = useState(false);
 
-const token = useSelector((state) => state.auth.user?.token);
+const token = localStorage.getItem("token");
 
 
 useEffect(() => {
