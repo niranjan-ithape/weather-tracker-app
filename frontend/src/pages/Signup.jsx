@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaUserAlt, FaEnvelope, FaLock } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +11,7 @@ const Signup = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,6 +44,7 @@ const Signup = () => {
       }
 
       toast.success("Signup successful! 🎉 Welcome to Weather Tracking App");
+      setTimeout(() =>{toast.dismiss();navigate("/login")}, 1500);
 
       // Reset form
       setFormData({ name: "", email: "", password: "" });
