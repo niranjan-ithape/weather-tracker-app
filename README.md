@@ -11,10 +11,15 @@ Open the folder weather-tracker-app in Visual Studio Code.
 
 3. Setup Backend .env
 Go to the backend folder and create a .env file with the following:
+
 MONGO_URI=your_mongodb_connection_string
+
 JWT_SECRET=superSecretKey123
+
 PORT=5000
+
 OPENWEATHER_API_KEY=your_openweather_api_key
+
 ⚙️ Replace these values with your real credentials.
 
 5. Run Frontend
