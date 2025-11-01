@@ -1,28 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
- 
-} from "recharts";
-import {
-  MapPin,
-  Thermometer,
-  Flame,
-  Snowflake,
-  Cloud,
-  Droplet,
-  Wind,
-  Clock,
-} from "lucide-react";
-
+import {LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,PieChart,Pie,Cell, } from "recharts";
+import {MapPin,Thermometer,Flame,Snowflake,Cloud,Droplet,Wind,Clock,} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 const NEON = {
@@ -73,7 +53,7 @@ const StatPod = ({ icon, title, value, accent }) => (
 );
 
 export default function FuturisticWeatherDashboard() {
-  // --- mock data: replace these with real API data
+  //mock data: replace these with real API data
   const [metrics, setMetrics] = useState({
     totalCities: 12,
     avgTemp: 28.4,
@@ -104,7 +84,7 @@ export default function FuturisticWeatherDashboard() {
     { name: "Storm", value: 1 },
   ];
 
-  // keep lastUpdated fresh (demo)
+  //keep lastUpdated fresh (demo)
   useEffect(() => {
     const t = setInterval(
       () => setMetrics((m) => ({ ...m, lastUpdated: new Date().toLocaleString() })),
@@ -113,8 +93,13 @@ export default function FuturisticWeatherDashboard() {
     return () => clearInterval(t);
   }, []);
 
-  // small shimmer anim for headers
+  //small shimmer anim for headers
   const headerMotion = { initial: { y: -8, opacity: 0 }, animate: { y: 0, opacity: 1 } };
+  const navigate = useNavigate();
+  
+  const handleProfileClick = () => {
+    navigate("/profile"); 
+  };
 
   return (
     <div className="min-h-screen p-6" style={{ background: "linear-gradient(180deg,#031029 0%, #071233 50%, #081026 100%)" }}>
@@ -142,7 +127,7 @@ export default function FuturisticWeatherDashboard() {
 
             <div className="flex items-center gap-4">
               <div className="text-sm text-slate-300">Auto-update: every hour</div>
-              <div className="px-3 py-2 rounded-lg bg-white/4 text-white text-sm">Profile</div>
+              <div onClick={handleProfileClick} className="px-3 py-2 rounded-lg bg-white/4 text-white text-sm">Profile</div>
             </div>
           </div>
         </motion.header>

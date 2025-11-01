@@ -27,7 +27,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      // ✅ Connect to backend API
+      //Connect to backend API
       const response = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: {

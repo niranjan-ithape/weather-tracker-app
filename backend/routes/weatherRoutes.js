@@ -1,4 +1,5 @@
 const express = require("express");
+const { auth } = require("../auth/authMiddleware.js");
 const {
   getCities,
   addCity,
@@ -9,10 +10,10 @@ const {
 
 const router = express.Router();
 
-router.get("/cities", getCities);
-router.post("/cities", addCity);
-router.delete("/cities/:id", deleteCity);
-router.get("/cities/suggest", searchCities);
-router.get("/cities/:city", getWeatherByCity);
+router.get("/cities", auth, getCities);
+router.post("/cities", auth, addCity);
+router.delete("/cities/:id", auth, deleteCity);
+router.get("/cities/suggest", auth, searchCities);
+router.get("/cities/:city", auth, getWeatherByCity);
 
 module.exports = router;

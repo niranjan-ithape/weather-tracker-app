@@ -10,6 +10,7 @@ import Dashboard from "../pages/Dashboard.jsx";
 import AddCity from "../pages/AddCity.jsx";
 import AllCities from "../pages/AllCities.jsx";
 import CityDetails from "../components/CityDetails.jsx";
+import Profile from "../pages/Profile.jsx";
 
 
 const UserRoutes = () => {
@@ -87,6 +88,14 @@ const UserRoutes = () => {
        id="9"
        path="/city/:cityName" 
        element={<CityDetails />} 
+     />
+
+      <Route 
+        id="10" 
+        path="/profile" 
+        element={<Layout>
+        <Profile/>    
+        </Layout>}
      />
 
        

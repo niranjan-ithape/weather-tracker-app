@@ -5,17 +5,17 @@ import { Mail, Phone, MapPin } from "lucide-react";
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
-  const handleChange = (e) => {
+const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+const handleSubmit = (e) => {
     e.preventDefault();
     alert("Thank you for contacting us! We’ll get back to you soon. 😊");
     setForm({ name: "", email: "", message: "" });
   };
 
-  return (
+return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-blue-500 to-sky-400 text-white flex flex-col">
       {/* ---------- HEADER ---------- */}
       <header className="text-center py-12 px-6">

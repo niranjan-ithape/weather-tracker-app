@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Cloud, Sun, Droplets, Wind } from "lucide-react";
 
 const About = () => {
-  return (
+return (
     <div className="min-h-screen bg-gradient-to-br from-sky-500 via-blue-500 to-indigo-600 text-white flex flex-col">
       {/* ---------- HEADER ---------- */}
       <header className="text-center py-12 px-6">

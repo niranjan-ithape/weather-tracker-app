@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Search,
-  Trash2,
-  Cloud,
-  Sun,
-  CloudRain,
-  Wind,
-  MapPin,
-  Thermometer,
-  Filter,
-  Eye,
-} from "lucide-react";
+import {Search,Trash2,Cloud,Sun,CloudRain,Wind,MapPin,Thermometer,Filter,Eye,} from "lucide-react";
+import { useSelector } from "react-redux";
+
+
 
 export default function AllCities() {
   const [cities, setCities] = useState([]);
@@ -20,12 +12,24 @@ export default function AllCities() {
   const [weatherFilter, setWeatherFilter] = useState("all");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.user?.token);
 
-  // ✅ Fetch data from backend API
-  useEffect(() => {
+ 
+useEffect(() => {
     const fetchCities = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/weather/cities");
+        
+        const res = await fetch("http://localhost:5000/api/weather/cities", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, 
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch cities. Unauthorized or invalid token.");
+        }
+
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -42,8 +46,8 @@ export default function AllCities() {
     fetchCities();
   }, []);
 
-  // ✅ Filter cities by search or condition
-  useEffect(() => {
+
+ useEffect(() => {
     let result = cities;
 
     if (searchTerm) {
@@ -61,8 +65,8 @@ export default function AllCities() {
     setFilteredCities(result);
   }, [searchTerm, weatherFilter, cities]);
 
-  // ✅ Sort cities
-  useEffect(() => {
+//Sort cities
+useEffect(() => {
     if (sortConfig.key) {
       const sorted = [...filteredCities].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key])
@@ -75,8 +79,8 @@ export default function AllCities() {
     }
   }, [sortConfig]);
 
-  // ✅ Handle sort click
-  const handleSort = (key) => {
+//Handle sort click
+const handleSort = (key) => {
     setSortConfig({
       key,
       direction:
@@ -86,26 +90,33 @@ export default function AllCities() {
     });
   };
 
-  // ✅ Remove city (backend + frontend)
-  const removeCity = async (id) => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/weather/cities/${id}`, {
-        method: "DELETE",
-      });
+// Remove city (backend + frontend)
+const removeCity = async (id) => {
+  try {
+    
 
-      if (res.ok) {
-        setCities((prev) => prev.filter((c) => c._id !== id));
-        console.log(`City with id ${id} deleted successfully`);
-      } else {
-        console.error("Failed to delete city:", await res.text());
-      }
-    } catch (error) {
-      console.error("Error deleting city:", error);
+    const res = await fetch(`http://localhost:5000/api/weather/cities/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, 
+      },
+    });
+
+    if (res.ok) {
+      setCities((prev) => prev.filter((c) => c._id !== id));
+      console.log(`City with id ${id} deleted successfully`);
+    } else {
+      console.error("Failed to delete city:", await res.text());
     }
-  };
+  } catch (error) {
+    console.error("Error deleting city:", error);
+  }
+};
 
-  // ✅ Get weather icon
-  const getWeatherIcon = (condition) => {
+
+//Get weather icon
+const getWeatherIcon = (condition) => {
     if (!condition) return <Cloud className="text-gray-400" size={20} />;
     switch (condition.toLowerCase()) {
       case "sunny":
@@ -126,15 +137,15 @@ export default function AllCities() {
     }
   };
 
-  // ✅ Temperature color
-  const getTempColor = (temp) => {
+//Temperature color
+const getTempColor = (temp) => {
     if (temp >= 35) return "text-red-600";
     if (temp >= 25) return "text-orange-500";
     if (temp >= 15) return "text-green-500";
     return "text-blue-500";
   };
 
-  const weatherConditions = [
+const weatherConditions = [
     "all",
     "sunny",
     "clouds",
@@ -144,7 +155,7 @@ export default function AllCities() {
     "smoke",
   ];
 
-  return (
+return (
     <div className="min-h-screen bg-gradient-to-b from-[#c9e5ff]/80 to-[#f7faff]/70 py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}

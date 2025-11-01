@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import debounce from "lodash/debounce";
 import { PlusCircle, Search, Cloud, Sun, CloudRain } from "lucide-react";
+import { useSelector } from "react-redux";
+
 
 const icon = (cond) =>
   ({
@@ -18,28 +20,42 @@ export default function AddCity() {
   const [suggestions, setSuggestions] = useState([]);
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+  const token = useSelector((state) => state.auth.user?.token);
+  console.log(token);
+  
 
-  // ✅ Debounced fetch for dynamic city suggestions
   const fetchSuggestions = async (query) => {
-    if (!query.trim()) {
-      setSuggestions([]);
-      return;
+  if (!query.trim()) {
+    setSuggestions([]);
+    return;
+  }
+
+  try {
+   
+
+    const res = await fetch(
+      `http://localhost:5000/api/weather/cities/suggest?s=${query}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch suggestions. Unauthorized or invalid token.");
     }
 
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/weather/cities/suggest?s=${query}`
-      );
-      const data = await res.json();
-      setSuggestions(data || []);
-    } catch (err) {
-      console.error("Error fetching suggestions:", err);
-    }
-  };
+    const data = await res.json();
+    setSuggestions(data || []);
+  } catch (err) {
+    console.error("Error fetching suggestions:", err);
+  }
+};
+const debouncedFetch = useCallback(debounce(fetchSuggestions, 300), []);
 
-  const debouncedFetch = useCallback(debounce(fetchSuggestions, 300), []);
-
-  useEffect(() => {
+useEffect(() => {
     if (city.trim()) {
       debouncedFetch(city);
     } else {
@@ -47,8 +63,8 @@ export default function AddCity() {
     }
   }, [city, debouncedFetch]);
 
-  // ✅ Close dropdown when clicking outside
-  useEffect(() => {
+//Close dropdown when clicking outside
+useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
@@ -62,47 +78,52 @@ export default function AddCity() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Add city (API integration)
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    if (!city.trim()) {
-      setMsg({ type: "err", text: "Please enter a city name" });
-      return;
+  
+const handleAdd = async (e) => {
+  e.preventDefault();
+
+  if (!city.trim()) {
+    setMsg({ type: "err", text: "Please enter a city name" });
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+
+    const res = await fetch("http://localhost:5000/api/weather/cities", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, 
+      },
+      body: JSON.stringify({ name: city }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setMsg({ type: "ok", text: `City "${city}" added successfully!` });
+    } else {
+      setMsg({ type: "err", text: data.message || "Failed to add city" });
     }
+  } catch (error) {
+    console.error("Error adding city:", error);
+    setMsg({ type: "err", text: "Server error. Please try again." });
+  } finally {
+    setLoading(false);
+    setCity("");
+    setSuggestions([]);
+    setTimeout(() => setMsg(null), 2500);
+  }
+};
 
-    try {
-      setLoading(true);
-      const res = await fetch("http://localhost:5000/api/weather/cities", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: city }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMsg({ type: "ok", text: `City "${city}" added successfully!` });
-      } else {
-        setMsg({ type: "err", text: data.message || "Failed to add city" });
-      }
-    } catch (error) {
-      console.error("Error adding city:", error);
-      setMsg({ type: "err", text: "Server error. Please try again." });
-    } finally {
-      setLoading(false);
-      setCity("");
-      setSuggestions([]);
-      setTimeout(() => setMsg(null), 2500);
-    }
-  };
-
-  // ✅ Handle select (single click only)
-  const handleSelect = (name) => {
+const handleSelect = (name) => {
     setCity(name);
     setSuggestions([]);
   };
 
-  return (
+return (
     <div className="fixed inset-0 bg-gradient-to-br from-slate-900 to-blue-900 text-white flex items-center justify-center px-4 select-none">
       <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-xl border border-white/20 animate-fade-in">
         {/* Header */}

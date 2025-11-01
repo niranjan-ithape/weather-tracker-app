@@ -5,10 +5,10 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 
 const Home = () => {
-  return (
+return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 via-sky-400 to-indigo-500 text-white flex flex-col">
       
-      {/* ✅ STATIC NAVBAR ADDED */}
+      {/* STATIC NAVBAR ADDED */}
       <Navbar />
 
       {/* ---------- HERO SECTION ---------- */}

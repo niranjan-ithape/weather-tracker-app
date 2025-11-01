@@ -3,24 +3,23 @@ import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import Sidebar from "./Sidebar.jsx";
 
+
 const Layout = ({ children }) => {
+  const token =localStorage.getItem("token");
   const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const location = useLocation();
+  console.log(token);
+  
+  
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  const sidebarRoutes = ["/dashboard", "/add-city", "/all-cities"];
+//Sidebar routes where you want sidebar + dashboard layout
+  const sidebarRoutes = ["/dashboard", "/add-city", "/all-cities", "/profile"];
   const isSidebarPage = sidebarRoutes.includes(location.pathname);
 
-  // ✅ Layout for sidebar pages
-  if (isLoggedIn && isSidebarPage) {
+//Automatically check login when token changes
+const isLoggedIn =token;
+
+if (isLoggedIn && isSidebarPage) {
     return (
       <div className="flex min-h-screen bg-[#0b1623] text-gray-100 relative overflow-hidden">
         {/* Sidebar */}
@@ -42,15 +41,14 @@ const Layout = ({ children }) => {
             </button>
           </header>
 
-          {/* Full-Width Page Content */}
+          {/* Page Content */}
           <main className="flex-1 bg-[#0b1623] w-full h-full">{children}</main>
         </div>
       </div>
     );
   }
 
-  // ✅ Public Layout (no sidebar)
-  return (
+return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-500 via-sky-400 to-indigo-500 text-white">
       <Navbar />
       <main className="flex-1">{children}</main>

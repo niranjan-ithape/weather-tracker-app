@@ -10,13 +10,13 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // ✅ for redirecting after login
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
@@ -27,7 +27,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // ✅ Real API call to backend
+      //Real API call to backend
       const response = await fetch("http://localhost:5000/api/auth/signin", {
         method: "POST",
         headers: {
@@ -44,24 +44,24 @@ const Login = () => {
 
       toast.success("Login successful! 🌤️ Welcome back to Weather Tracking App");
 
-      // ✅ Optional: Save token in localStorage
+      //Optional: Save token in localStorage
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
-      // ✅ Redirect to dashboard or home
+      //Redirect to dashboard or home
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
 
-      // Reset form
+      //Reset form
       setFormData({ email: "", password: "" });
     } catch (error) {
       toast.error(error.message || "Login failed! Please try again.");
     } finally {
       setLoading(false);
     }
-  };
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 p-6 sm:p-10">

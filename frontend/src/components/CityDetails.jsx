@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  X,
-  Droplets,
-  Wind,
-  Gauge,
-  Sun,
-  Eye,
-  Navigation,
-} from "lucide-react";
+import {X,Droplets,Wind,Gauge,Sun,Eye,Navigation,} from "lucide-react";
+import { useSelector } from "react-redux";
 
 const CityDetails = ({ getWeatherIcon }) => {
   const { cityName } = useParams();
@@ -18,36 +11,51 @@ const CityDetails = ({ getWeatherIcon }) => {
   const [error, setError] = useState(null);
   const [closing, setClosing] = useState(false);
 
-  /* ---------- FETCH CITY DATA ---------- */
-  useEffect(() => {
-    const fetchCityData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(
-          `http://localhost:5000/api/weather/cities/${cityName}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch weather data");
-        const data = await res.json();
-        setCity(data);
-      } catch (err) {
-        console.error("Error fetching city data:", err);
-        setError("Unable to load weather data. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (cityName) fetchCityData();
-  }, [cityName]);
+const token = useSelector((state) => state.auth.user?.token);
 
-  /* ---------- CLOSE HANDLER WITH ANIMATION ---------- */
-  const handleClose = () => {
+
+useEffect(() => {
+  const fetchCityData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // const token = localStorage.getItem("token"); // ✅ Get JWT token
+
+      const res = await fetch(
+        `http://localhost:5000/api/weather/cities/${cityName}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch weather data");
+
+      const data = await res.json();
+      setCity(data);
+    } catch (err) {
+      console.error("Error fetching city data:", err);
+      setError("Unable to load weather data. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (cityName) fetchCityData();
+}, [cityName]);
+
+
+ 
+const handleClose = () => {
     setClosing(true);
     setTimeout(() => navigate("/all-cities"), 400);
   };
 
-  /* ---------- UI STATES ---------- */
-  if (loading) {
+ 
+if(loading) {
     return (
       <div className="fixed inset-0 bg-black/70 backdrop-blur-lg flex items-center justify-center text-white text-lg">
         <p>
@@ -73,15 +81,14 @@ const CityDetails = ({ getWeatherIcon }) => {
 
   if (!city) return null;
 
-  /* ---------- HELPERS ---------- */
-  const formatTime = (timestamp) =>
+const formatTime = (timestamp) =>
     new Date(timestamp * 1000).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
     });
 
-  const formatLastUpdated = (dateString) =>
+const formatLastUpdated = (dateString) =>
     new Date(dateString).toLocaleString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -91,7 +98,7 @@ const CityDetails = ({ getWeatherIcon }) => {
       minute: "2-digit",
     });
 
-  const getCountryName = (countryCode) => {
+const getCountryName = (countryCode) => {
     const countryNames = {
       IN: "India",
       US: "United States",
@@ -100,7 +107,7 @@ const CityDetails = ({ getWeatherIcon }) => {
     return countryNames[countryCode] || countryCode;
   };
 
-  const getWeatherBackground = (condition) => {
+const getWeatherBackground = (condition) => {
     const cond = condition.toLowerCase();
     if (cond.includes("clear")) return "from-blue-400 to-cyan-400";
     if (cond.includes("cloud")) return "from-gray-400 to-blue-300";
@@ -109,8 +116,8 @@ const CityDetails = ({ getWeatherIcon }) => {
     return "from-blue-400 to-cyan-500";
   };
 
-  /* ---------- RENDER ---------- */
-  return (
+  
+return (
     <div
       className={`fixed inset-0 bg-black/70 backdrop-blur-lg flex items-center justify-center z-50 p-4 
       ${closing ? "animate-fade-out" : "animate-fade-in"}`}
