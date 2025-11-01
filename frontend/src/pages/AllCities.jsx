@@ -1,5 +1,5 @@
-import CityDetails from "../components/CityDetails";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Trash2,
@@ -19,7 +19,7 @@ export default function AllCities() {
   const [searchTerm, setSearchTerm] = useState("");
   const [weatherFilter, setWeatherFilter] = useState("all");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-  const [selectedCity, setSelectedCity] = useState(null);
+  const navigate = useNavigate();
 
   // ✅ Fetch data from backend API
   useEffect(() => {
@@ -86,8 +86,23 @@ export default function AllCities() {
     });
   };
 
-  // ✅ Remove city (only frontend removal)
-  const removeCity = (id) => setCities((prev) => prev.filter((c) => c._id !== id));
+  // ✅ Remove city (backend + frontend)
+  const removeCity = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/weather/cities/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setCities((prev) => prev.filter((c) => c._id !== id));
+        console.log(`City with id ${id} deleted successfully`);
+      } else {
+        console.error("Failed to delete city:", await res.text());
+      }
+    } catch (error) {
+      console.error("Error deleting city:", error);
+    }
+  };
 
   // ✅ Get weather icon
   const getWeatherIcon = (condition) => {
@@ -264,7 +279,7 @@ export default function AllCities() {
 
                     <td className="px-6 py-4">
                       <button
-                        onClick={() => setSelectedCity(city)}
+                        onClick={() => navigate(`/city/${encodeURIComponent(city.name)}`)}
                         className="flex items-center justify-center gap-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-110 border border-blue-200 hover:border-blue-300"
                         title="View City"
                       >
@@ -306,18 +321,12 @@ export default function AllCities() {
       <div className="fixed top-10 right-10 opacity-20 animate-float">
         <Cloud size={80} className="text-blue-400" />
       </div>
-      <div className="fixed bottom-20 left-10 opacity-20 animate-float" style={{ animationDelay: "2s" }}>
+      <div
+        className="fixed bottom-20 left-10 opacity-20 animate-float"
+        style={{ animationDelay: "2s" }}
+      >
         <Sun size={60} className="text-yellow-400" />
       </div>
-
-      {/* ✅ City Details Modal */}
-      {selectedCity && (
-        <CityDetails
-          city={selectedCity}
-          onClose={() => setSelectedCity(null)}
-          getWeatherIcon={getWeatherIcon}
-        />
-      )}
 
       {/* Animations */}
       <style jsx>{`

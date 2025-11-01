@@ -9,6 +9,7 @@ import Layout from "../components/Layout.jsx";
 import Dashboard from "../pages/Dashboard.jsx"; 
 import AddCity from "../pages/AddCity.jsx";
 import AllCities from "../pages/AllCities.jsx";
+import CityDetails from "../components/CityDetails.jsx";
 
 
 const UserRoutes = () => {
@@ -81,6 +82,13 @@ const UserRoutes = () => {
         <AllCities/>    
         </Layout>}
      />
+
+      <Route 
+       id="9"
+       path="/city/:cityName" 
+       element={<CityDetails />} 
+     />
+
        
       <Route 
       path="*"
