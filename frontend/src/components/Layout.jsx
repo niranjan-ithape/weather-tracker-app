@@ -1,73 +1,59 @@
-// src/components/Layout.jsx
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import Sidebar from "./Sidebar.jsx";
 
 const Layout = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const location = useLocation();
 
-  // ✅ Recheck login when localStorage changes (e.g., after login/logout)
   useEffect(() => {
     const handleStorageChange = () => {
       setIsLoggedIn(!!localStorage.getItem("token"));
     };
-
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // ✅ Auto-open sidebar when logged in
-  useEffect(() => {
-    if (isLoggedIn) setOpen(true);
-    else setOpen(false);
-  }, [isLoggedIn]);
+  const sidebarRoutes = ["/dashboard", "/add-city", "/all-cities"];
+  const isSidebarPage = sidebarRoutes.includes(location.pathname);
 
-  // ✅ If not logged in → show old layout (Navbar + background)
-  if (!isLoggedIn) {
+  // ✅ Layout for sidebar pages
+  if (isLoggedIn && isSidebarPage) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-500 via-sky-400 to-indigo-500 text-white">
-        {/* Navbar visible on every page */}
-        <Navbar />
+      <div className="flex min-h-screen bg-[#0b1623] text-gray-100 relative overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar open={open} setOpen={setOpen} />
 
-        {/* Page content */}
-        <main className="flex-1">{children}</main>
+        {/* Main Content */}
+        <div
+          className={`flex-1 flex flex-col transition-all duration-500 ${
+            open ? "ml-64" : "ml-0"
+          }`}
+        >
+          {/* Header with Hamburger */}
+          <header className="flex items-center justify-between p-4 bg-[#0b1623]/90 backdrop-blur-md border-b border-gray-700 sticky top-0 z-20">
+            <button
+              onClick={() => setOpen(!open)}
+              className="text-sky-400 text-3xl hover:text-sky-300 transition"
+            >
+              ☰
+            </button>
+          </header>
 
-        {/* Footer (optional) */}
-        {/* 
-        <footer className="bg-white/10 py-4 text-center text-sm">
-          <p>
-            © {new Date().getFullYear()}{" "}
-            <span className="font-semibold">WeatherNow</span> — Built with ❤️ by Niranjan
-          </p>
-        </footer>
-        */}
+          {/* Full-Width Page Content */}
+          <main className="flex-1 bg-[#0b1623] w-full h-full">{children}</main>
+        </div>
       </div>
     );
   }
 
-  // ✅ If logged in → show new layout (Sidebar + Hamburger)
+  // ✅ Public Layout (no sidebar)
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-sky-50 via-sky-100 to-white text-gray-900">
-      {/* Sidebar */}
-      <Sidebar open={open} setOpen={setOpen} />
-
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col">
-        {/* Mobile header with hamburger */}
-        <header className="lg:hidden flex items-center justify-between p-4 bg-white shadow">
-          <h1 className="text-xl font-semibold text-sky-600">Weather App</h1>
-          <button
-            className="text-sky-600 text-2xl"
-            onClick={() => setOpen(!open)}
-          >
-            ☰
-          </button>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 p-6">{children}</main>
-      </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-500 via-sky-400 to-indigo-500 text-white">
+      <Navbar />
+      <main className="flex-1">{children}</main>
     </div>
   );
 };

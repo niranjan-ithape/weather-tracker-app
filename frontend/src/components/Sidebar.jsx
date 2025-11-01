@@ -1,94 +1,87 @@
-// components/Sidebar.jsx
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, PlusCircle, List } from "lucide-react";
+import { motion } from "framer-motion";
+import { Home, Plus, List } from "lucide-react";
 
-const navItems = [
-  { to: "/dashboard", label: "Dashboard", icon: <Home size={18} /> },
-  { to: "/add-city", label: "Add City", icon: <PlusCircle size={18} /> },
-  { to: "/all-cities", label: "All Cities", icon: <List size={18} /> },
-];
-
-export default function Sidebar() {
-  const [open, setOpen] = useState(false);
-
+const Sidebar = ({ open, setOpen }) => {
   return (
     <>
-      {/* mobile overlay */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.35 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 bg-black z-30 lg:hidden"
-          />
-        )}
-      </AnimatePresence>
+      {/* Overlay for mobile */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30"
+        />
+      )}
 
+      {/* Sidebar */}
       <motion.aside
-        initial={false}
-        animate={{ x: 0 }}
-        className={`z-40 fixed top-0 left-0 h-full transform transition-all lg:static lg:translate-x-0`}
-        style={{ width: open ? 260 : 72 }}
+        animate={{ x: open ? 0 : -280 }}
+        transition={{ type: "spring", stiffness: 80 }}
+        className="fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#c9e5ff]/80 to-[#f7faff]/70
+                   backdrop-blur-xl shadow-xl border-r border-sky-100 z-40 flex flex-col"
       >
-        <div className="h-full flex flex-col bg-gradient-to-b from-white/70 to-white/60 backdrop-blur-lg border-r border-white/10 shadow-lg">
-          {/* header */}
-          <div className="flex items-center justify-between px-3 py-3 border-b border-white/8">
-            <div className="flex items-center gap-2">
-              <div className="rounded-lg p-1 bg-gradient-to-br from-indigo-600 to-cyan-500 text-white">
-                🌦️
-              </div>
-              {open && <div className="text-sm font-semibold">Nebula Weather</div>}
-            </div>
-
-            {/* hamburger */}
-            <button
-              className="p-2 rounded-md hover:bg-white/10"
-              onClick={() => setOpen((s) => !s)}
-              aria-label="Toggle sidebar"
-            >
-              {open ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-
-          {/* nav */}
-          <nav className="flex-1 overflow-auto px-2 py-4 space-y-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/6 transition-colors ${
-                    isActive ? "bg-gradient-to-r from-indigo-600/30 to-cyan-500/20 text-white" : "text-slate-700"
-                  }`
-                }
-                onClick={() => setOpen(false)}
-              >
-                <div className="opacity-90">{item.icon}</div>
-                {open && <span className="text-sm font-medium">{item.label}</span>}
-              </NavLink>
-            ))}
-          </nav>
-
-          {/* footer */}
-          <div className="px-3 py-4 border-t border-white/6">
-            <div className="flex items-center gap-2">
-              <div className="rounded-md bg-white/6 p-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
-                  <path d="M12 2v6" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              {open && <div className="text-xs text-slate-500">Auto-update every hour</div>}
-            </div>
-          </div>
+        {/* Simple Header */}
+        <div className="flex items-center justify-between p-5 border-b border-sky-100/50">
+          <h2 className="text-lg font-semibold text-sky-600">Menu</h2>
+          <button
+            onClick={() => setOpen(false)}
+            className="text-sky-500 text-2xl hover:text-sky-700"
+          >
+            ✕
+          </button>
         </div>
-      </motion.aside>
 
-      {/* spacer for large screens (so content isn't under the sidebar) */}
-      <div className="hidden lg:block w-18" style={{ width: 72 }} />
+        {/* Navigation Links */}
+        <nav className="flex-1 p-4 space-y-2 text-gray-700 font-medium">
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${
+                isActive
+                  ? "bg-gradient-to-r from-[#d0e8ff] to-[#b3dbff] text-sky-700 font-semibold shadow-md"
+                  : "hover:bg-sky-100"
+              }`
+            }
+            onClick={() => setOpen(false)}
+          >
+            <Home size={20} />
+            Dashboard
+          </NavLink>
+
+          <NavLink
+            to="/add-city"
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${
+                isActive
+                  ? "bg-gradient-to-r from-[#d0e8ff] to-[#b3dbff] text-sky-700 font-semibold shadow-md"
+                  : "hover:bg-sky-100"
+              }`
+            }
+            onClick={() => setOpen(false)}
+          >
+            <Plus size={20} />
+            Add City
+          </NavLink>
+
+          <NavLink
+            to="/all-cities"
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${
+                isActive
+                  ? "bg-gradient-to-r from-[#d0e8ff] to-[#b3dbff] text-sky-700 font-semibold shadow-md"
+                  : "hover:bg-sky-100"
+              }`
+            }
+            onClick={() => setOpen(false)}
+          >
+            <List size={20} />
+            All Cities
+          </NavLink>
+        </nav>
+      </motion.aside>
     </>
   );
-}
+};
+
+export default Sidebar;
