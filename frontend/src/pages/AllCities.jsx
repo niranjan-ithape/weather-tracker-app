@@ -31,42 +31,31 @@ export default function AllCities() {
             Authorization: `Bearer ${token}`,
           },
         });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch cities. Unauthorized or invalid token.");
-        }
-
+        if (!res.ok) throw new Error("Failed to fetch cities. Unauthorized or invalid token.");
         const data = await res.json();
-
         if (Array.isArray(data)) {
           setCities(data);
           setFilteredCities(data);
-        } else {
-          console.error("Unexpected API response:", data);
-        }
+        } else console.error("Unexpected API response:", data);
       } catch (error) {
         console.error("Error fetching cities:", error);
       }
     };
-
     fetchCities();
   }, []);
 
   useEffect(() => {
     let result = cities;
-
     if (searchTerm) {
       result = result.filter((city) =>
         city.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     if (weatherFilter !== "all") {
       result = result.filter((city) =>
         city.condition.toLowerCase().includes(weatherFilter.toLowerCase())
       );
     }
-
     setFilteredCities(result);
   }, [searchTerm, weatherFilter, cities]);
 
@@ -102,36 +91,31 @@ export default function AllCities() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (res.ok) {
-        setCities((prev) => prev.filter((c) => c._id !== id));
-        console.log(`City with id ${id} deleted successfully`);
-      } else {
-        console.error("Failed to delete city:", await res.text());
-      }
+      if (res.ok) setCities((prev) => prev.filter((c) => c._id !== id));
+      else console.error("Failed to delete city:", await res.text());
     } catch (error) {
       console.error("Error deleting city:", error);
     }
   };
 
   const getWeatherIcon = (condition) => {
-    if (!condition) return <Cloud className="text-gray-400" size={20} />;
+    if (!condition) return <Cloud className="text-gray-400" size={18} />;
     switch (condition.toLowerCase()) {
       case "sunny":
       case "clear":
-        return <Sun className="text-yellow-500" size={20} />;
+        return <Sun className="text-yellow-500" size={18} />;
       case "rainy":
       case "rain":
-        return <CloudRain className="text-blue-500" size={20} />;
+        return <CloudRain className="text-blue-500" size={18} />;
       case "clouds":
       case "cloudy":
-        return <Cloud className="text-gray-500" size={20} />;
+        return <Cloud className="text-gray-500" size={18} />;
       case "haze":
       case "mist":
       case "smoke":
-        return <Wind className="text-green-500" size={20} />;
+        return <Wind className="text-green-500" size={18} />;
       default:
-        return <Cloud className="text-gray-400" size={20} />;
+        return <Cloud className="text-gray-400" size={18} />;
     }
   };
 
@@ -142,55 +126,50 @@ export default function AllCities() {
     return "text-blue-500";
   };
 
-  const weatherConditions = [
-    "all",
-    "sunny",
-    "clouds",
-    "rainy",
-    "haze",
-    "mist",
-    "smoke",
-  ];
+  const weatherConditions = ["all", "sunny", "clouds", "rainy", "haze", "mist", "smoke"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#c9e5ff]/80 to-[#f7faff]/70 py-6 px-4 sm:py-8">
+    <div
+      className="min-h-screen py-6 px-3 sm:px-6"
+      style={{
+        background:
+          "linear-gradient(rgb(3, 16, 41) 0%, rgb(7, 18, 51) 50%, rgb(8, 16, 38) 100%)",
+      }}
+    >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-6 sm:mb-8 animate-fade-in">
-          <div className="flex justify-center items-center mb-3 sm:mb-4">
-            <div className="relative">
-              <MapPin className="text-blue-600 absolute -top-2 -left-2 opacity-70 hidden sm:block" size={32} />
-              <Thermometer className="text-blue-600 relative z-10" size={40} sm:size={48} />
-            </div>
+        <div className="text-center mb-6 animate-fade-in">
+          <div className="flex justify-center items-center mb-2">
+            <MapPin className="text-blue-500 mr-2" size={28} />
+            <Thermometer className="text-blue-500" size={32} />
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-1 sm:mb-2">
-            Weather Dashboard
-          </h2>
-          <p className="text-sm sm:text-base text-gray-600">Track and manage all your cities' weather data</p>
+          <p className="text-gray-300 text-sm sm:text-base">
+            Track and manage all your cities' weather data
+          </p>
         </div>
 
-        {/* Search & Filter */}
+        {/* Search + Filter */}
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-4 sm:p-6 mb-6 border border-white/60 animate-slide-up">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {/* Search Bar */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
+            {/* Search */}
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} sm:size={20} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
                 placeholder="Search cities..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white text-gray-800 text-sm sm:text-base"
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all bg-white text-gray-800 text-sm sm:text-base"
               />
             </div>
 
-            {/* Weather Filter */}
-            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <Filter className="text-gray-500" size={18} sm:size={20} />
+            {/* Filter */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Filter className="text-gray-500" size={18} />
               <select
                 value={weatherFilter}
                 onChange={(e) => setWeatherFilter(e.target.value)}
-                className="w-full sm:w-auto px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white text-gray-800 text-sm sm:text-base"
+                className="flex-1 sm:flex-none px-3 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 bg-white text-gray-800 text-sm sm:text-base"
               >
                 {weatherConditions.map((condition) => (
                   <option key={condition} value={condition}>
@@ -201,7 +180,7 @@ export default function AllCities() {
             </div>
 
             {/* Count */}
-            <div className="text-xs sm:text-sm text-gray-600 bg-blue-50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg whitespace-nowrap">
+            <div className="text-xs sm:text-sm text-gray-600 bg-blue-50 px-3 py-2 rounded-lg text-center">
               {filteredCities.length} {filteredCities.length === 1 ? "city" : "cities"} found
             </div>
           </div>
@@ -210,104 +189,88 @@ export default function AllCities() {
         {/* Table */}
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 overflow-hidden animate-slide-up">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] sm:min-w-0">
+            <table className="w-full min-w-[700px] text-xs sm:text-sm">
               <thead>
                 <tr className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-gray-200">
                   <th
                     onClick={() => handleSort("name")}
-                    className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors duration-200 min-w-[130px]"
+                    className="px-4 py-3 text-left font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors whitespace-nowrap"
                   >
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <MapPin size={14} sm:size={16} /> City
+                    <div className="flex items-center gap-2">
+                      <MapPin size={14} /> City
                       {sortConfig.key === "name" && (
-                        <span className="text-blue-500 text-lg">
-                          {sortConfig.direction === "asc" ? "↑" : "↓"}
-                        </span>
+                        <span className="text-blue-500">{sortConfig.direction === "asc" ? "↑" : "↓"}</span>
                       )}
                     </div>
                   </th>
-
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-700 min-w-[110px]">
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <Cloud size={14} sm:size={16} /> Condition
-                    </div>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap">
+                    Condition
                   </th>
-
                   <th
                     onClick={() => handleSort("temperature")}
-                    className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors duration-200 min-w-[100px]"
+                    className="px-4 py-3 text-left font-semibold text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors whitespace-nowrap"
                   >
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <Thermometer size={14} sm:size={16} /> Temperature
-                      {sortConfig.key === "temperature" && (
-                        <span className="text-blue-500 text-lg">
-                          {sortConfig.direction === "asc" ? "↑" : "↓"}
-                        </span>
-                      )}
-                    </div>
+                    Temperature
+                    {sortConfig.key === "temperature" && (
+                      <span className="text-blue-500 ml-1">
+                        {sortConfig.direction === "asc" ? "↑" : "↓"}
+                      </span>
+                    )}
                   </th>
-
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-700 min-w-[80px]">
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <Eye size={14} sm:size={16} /> View
-                    </div>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap">
+                    View
                   </th>
-
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-gray-700 min-w-[80px]">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap">
                     Actions
                   </th>
                 </tr>
               </thead>
-
               <tbody>
-                {filteredCities.map((city, index) => (
+                {filteredCities.map((city, i) => (
                   <tr
                     key={city._id}
-                    className="border-b border-gray-100 hover:bg-blue-50/50 transition-all duration-300 animate-fade-in"
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    className="border-b border-gray-100 hover:bg-blue-50 transition-all animate-fade-in"
+                    style={{ animationDelay: `${i * 0.05}s` }}
                   >
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-base">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-base">
+                    <td className="px-4 py-3 font-medium whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                           {city.name.charAt(0)}
                         </div>
                         <div>
-                          <div className="font-semibold text-gray-900 text-sm sm:text-base">{city.name}</div>
-                          <div className="text-xs text-gray-500">{city.country}</div>
+                          <div className="text-gray-900 font-semibold text-sm sm:text-base">
+                            {city.name}
+                          </div>
+                          <div className="text-gray-500 text-xs">{city.country}</div>
                         </div>
                       </div>
                     </td>
-
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <div className="flex items-center gap-2 sm:gap-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
                         {getWeatherIcon(city.condition)}
-                        <span className="font-medium text-gray-700 text-xs sm:text-sm">{city.condition}</span>
+                        <span className="text-gray-700 font-medium">{city.condition}</span>
                       </div>
                     </td>
-
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <div className={`text-lg sm:text-xl font-bold ${getTempColor(city.temperature)}`}>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`font-bold ${getTempColor(city.temperature)}`}>
                         {city.temperature.toFixed(1)}°C
-                      </div>
+                      </span>
                     </td>
-
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <button
                         onClick={() => navigate(`/city/${encodeURIComponent(city.name)}`)}
-                        className="flex items-center justify-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-105 sm:hover:scale-110 border border-blue-200 hover:border-blue-300 text-xs sm:text-sm w-full sm:w-auto"
-                        title="View City"
+                        className="flex items-center justify-center gap-2 px-3 py-1.5 text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200 transition-all"
                       >
-                        <Eye size={16} sm:size={18} />
+                        <Eye size={16} />
                         <span className="hidden sm:inline">View</span>
                       </button>
                     </td>
-
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <button
                         onClick={() => removeCity(city._id)}
-                        className="flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-105 border border-red-200 hover:border-red-300 text-xs sm:text-sm w-full sm:w-auto"
+                        className="flex items-center justify-center gap-2 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition-all"
                       >
-                        <Trash2 size={14} sm:size={16} />
+                        <Trash2 size={14} />
                         <span className="hidden sm:inline">Remove</span>
                       </button>
                     </td>
@@ -317,30 +280,29 @@ export default function AllCities() {
             </table>
           </div>
 
-          {/* Empty state */}
           {filteredCities.length === 0 && (
-            <div className="text-center py-10 sm:py-12 animate-fade-in px-4">
-              <Cloud className="mx-auto text-gray-400 mb-4" size={40} sm:size={48} />
-              <div className="text-gray-500 text-base sm:text-lg mb-2">No cities found</div>
-              <div className="text-gray-400 text-xs sm:text-sm">
+            <div className="text-center py-10 px-4 animate-fade-in">
+              <Cloud className="mx-auto text-gray-400 mb-3" size={40} />
+              <p className="text-gray-500 mb-1">No cities found</p>
+              <p className="text-gray-400 text-xs sm:text-sm">
                 {searchTerm || weatherFilter !== "all"
                   ? "Try adjusting your search or filter criteria"
                   : "No cities are being tracked yet"}
-              </div>
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Floating icons */}
-      <div className="fixed top-6 sm:top-10 right-4 sm:right-10 opacity-20 animate-float">
-        <Cloud size={60} sm:size={80} className="text-blue-400" />
+      {/* Floating Icons */}
+      <div className="fixed top-6 right-4 sm:right-10 opacity-20 animate-float">
+        <Cloud size={60} className="text-blue-400" />
       </div>
       <div
-        className="fixed bottom-12 sm:bottom-20 left-4 sm:left-10 opacity-20 animate-float"
+        className="fixed bottom-12 left-4 sm:left-10 opacity-20 animate-float"
         style={{ animationDelay: "2s" }}
       >
-        <Sun size={48} sm:size={60} className="text-yellow-400" />
+        <Sun size={50} className="text-yellow-400" />
       </div>
 
       {/* Animations */}
@@ -368,17 +330,17 @@ export default function AllCities() {
         @keyframes float {
           0%,
           100% {
-            transform: translateY(0px) rotate(0deg);
+            transform: translateY(0);
           }
           50% {
-            transform: translateY(-20px) rotate(5deg);
+            transform: translateY(-20px);
           }
         }
         .animate-fade-in {
-          animation: fadeIn 0.5s ease-out forwards;
+          animation: fadeIn 0.6s ease-out forwards;
         }
         .animate-slide-up {
-          animation: slideUp 0.6s ease-out;
+          animation: slideUp 0.7s ease-out;
         }
         .animate-float {
           animation: float 6s ease-in-out infinite;

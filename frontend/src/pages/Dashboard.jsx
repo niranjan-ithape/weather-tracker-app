@@ -1,27 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import {
-  MapPin,
-  Thermometer,
-  Flame,
-  Snowflake,
-  Cloud,
-  Droplet,
-  Wind,
-  Clock,
-  RefreshCcw,
-} from "lucide-react";
+import {LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,PieChart,Pie, Cell,} from "recharts";
+import {MapPin,Thermometer,Flame,Snowflake,Cloud,Droplet,Wind,Clock,RefreshCcw,} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const NEON = {
@@ -37,7 +17,7 @@ const StatPod = ({ icon, title, value, accent }) => (
     animate={{ opacity: 1, y: 0 }}
     whileHover={{ scale: 1.03, y: -6 }}
     transition={{ duration: 0.35 }}
-    className="relative rounded-2xl p-4 bg-[radial-gradient(ellipse_at_top_left,_rgba(255,255,255,0.03),transparent)] border border-white/6 shadow-[0_8px_30px_rgba(124,58,237,0.08)]"
+    className="relative rounded-2xl p-4 bg-[radial-gradient(ellipse_at_top_left,_rgba(255,255,255,0.03),transparent)] border border-white/10 shadow-lg flex flex-col"
     style={{
       boxShadow: `0 6px 24px rgba(2,6,23,0.6), 0 0 18px ${accent}33`,
       backdropFilter: "blur(8px)",
@@ -45,7 +25,7 @@ const StatPod = ({ icon, title, value, accent }) => (
   >
     <div className="flex items-start gap-3">
       <div
-        className="p-3 rounded-lg"
+        className="p-3 rounded-lg flex items-center justify-center"
         style={{
           background: `linear-gradient(135deg, ${accent}22, ${accent}11)`,
           border: `1px solid ${accent}44`,
@@ -57,19 +37,11 @@ const StatPod = ({ icon, title, value, accent }) => (
         <div className="text-xs uppercase tracking-wide text-slate-300">
           {title}
         </div>
-        <div className="text-2xl font-bold text-white mt-1">{value}</div>
+        <div className="text-2xl font-bold text-white mt-1 break-words">
+          {value}
+        </div>
       </div>
     </div>
-    <div
-      style={{
-        position: "absolute",
-        inset: "-1px",
-        borderRadius: 12,
-        pointerEvents: "none",
-        boxShadow: `0 0 40px ${accent}55 inset`,
-        opacity: 0.5,
-      }}
-    />
   </motion.div>
 );
 
@@ -79,7 +51,6 @@ export default function FuturisticWeatherDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // ✅ define fetchData outside useEffect so we can call it on refresh
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -166,66 +137,54 @@ export default function FuturisticWeatherDashboard() {
       avg: c.temperature,
     })) || [];
 
-  const headerMotion = {
-    initial: { y: -8, opacity: 0 },
-    animate: { y: 0, opacity: 1 },
-  };
-
   const handleProfileClick = () => navigate("/profile");
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen p-4 sm:p-6"
       style={{
         background:
           "linear-gradient(180deg,#031029 0%, #071233 50%, #081026 100%)",
       }}
     >
-      <div className="max-w-[1200px] mx-auto">
+      <div className="max-w-[1280px] mx-auto">
         <motion.header
-          {...headerMotion}
+          initial={{ y: -8, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div
                 style={{
                   background: `linear-gradient(135deg, ${NEON.purple}, ${NEON.cyan})`,
                 }}
-                className="p-3 rounded-2xl shadow-[0_10px_30px_rgba(7,89,133,0.25)]"
+                className="p-3 rounded-2xl shadow-lg flex items-center justify-center"
               >
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="url(#g1)"
-                    strokeWidth="1.6"
-                  />
-                </svg>
+                <Cloud className="text-white" size={26} />
               </div>
               <div>
-                <div className="text-2xl font-extrabold text-white tracking-tight">
+                <div className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2 text-center sm:text-left">
                   Weather Dashboard
                 </div>
-                <div className="text-sm text-slate-300">
+                <div className="text-sm text-slate-300 text-center sm:text-left">
                   Real-time weather analytics
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap justify-center sm:justify-end items-center gap-3">
               <button
                 onClick={fetchData}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition"
               >
                 <RefreshCcw size={16} />
-                Refresh Data
+                Refresh
               </button>
               <div
                 onClick={handleProfileClick}
-                className="px-3 py-2 rounded-lg bg-white/4 text-white text-sm cursor-pointer"
+                className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm cursor-pointer transition"
               >
                 Profile
               </div>
@@ -246,91 +205,40 @@ export default function FuturisticWeatherDashboard() {
             <>
               {/* Stats Grid */}
               <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatPod
-                  icon={<MapPin size={20} className="text-white" />}
-                  title="Total Cities"
-                  value={metrics.totalCities}
-                  accent={NEON.cyan}
-                />
-                <StatPod
-                  icon={<Thermometer size={20} className="text-white" />}
-                  title="Average Temp"
-                  value={`${metrics.avgTemp}°C`}
-                  accent={NEON.purple}
-                />
-                <StatPod
-                  icon={<Flame size={20} className="text-white" />}
-                  title="Hottest City"
-                  value={`${metrics.hottestCity}`}
-                  accent={NEON.pink}
-                />
-                <StatPod
-                  icon={<Snowflake size={20} className="text-white" />}
-                  title="Coldest City"
-                  value={`${metrics.coldestCity}`}
-                  accent={NEON.cyan}
-                />
-                <StatPod
-                  icon={<Cloud size={20} className="text-white" />}
-                  title="Global Condition"
-                  value={metrics.globalCondition}
-                  accent={NEON.purple}
-                />
-                <StatPod
-                  icon={<Droplet size={20} className="text-white" />}
-                  title="Average Humidity"
-                  value={`${metrics.avgHumidity}%`}
-                  accent={NEON.cyan}
-                />
-                <StatPod
-                  icon={<Wind size={20} className="text-white" />}
-                  title="Average Wind"
-                  value={`${metrics.avgWind} km/h`}
-                  accent={NEON.pink}
-                />
-                <StatPod
-                  icon={<Clock size={20} className="text-white" />}
-                  title="Last Updated"
-                  value={metrics.lastUpdated}
-                  accent={NEON.yellow}
-                />
+                <StatPod icon={<MapPin size={20} className="text-white" />} title="Total Cities" value={metrics.totalCities} accent={NEON.cyan} />
+                <StatPod icon={<Thermometer size={20} className="text-white" />} title="Average Temp" value={`${metrics.avgTemp}°C`} accent={NEON.purple} />
+                <StatPod icon={<Flame size={20} className="text-white" />} title="Hottest City" value={metrics.hottestCity} accent={NEON.pink} />
+                <StatPod icon={<Snowflake size={20} className="text-white" />} title="Coldest City" value={metrics.coldestCity} accent={NEON.cyan} />
+                <StatPod icon={<Cloud size={20} className="text-white" />} title="Global Condition" value={metrics.globalCondition} accent={NEON.purple} />
+                <StatPod icon={<Droplet size={20} className="text-white" />} title="Average Humidity" value={`${metrics.avgHumidity}%`} accent={NEON.cyan} />
+                <StatPod icon={<Wind size={20} className="text-white" />} title="Average Wind" value={`${metrics.avgWind} km/h`} accent={NEON.pink} />
+                <StatPod icon={<Clock size={20} className="text-white" />} title="Last Updated" value={metrics.lastUpdated} accent={NEON.yellow} />
               </section>
 
-              {/* Charts */}
+              {/* Charts Section */}
               <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-gradient-to-tr from-[#051124] to-[#07112a] border border-white/6 rounded-2xl p-5 shadow-[0_20px_60px_rgba(3,6,23,0.6)]">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="lg:col-span-2 bg-gradient-to-tr from-[#051124] to-[#07112a] border border-white/10 rounded-2xl p-5 shadow-xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
                     <div>
-                      <div className="text-white font-semibold">
+                      <div className="text-white font-semibold text-center sm:text-left">
                         Temperature Trends
                       </div>
-                      <div className="text-sm text-slate-400">
+                      <div className="text-sm text-slate-400 text-center sm:text-left">
                         City-wise temperature overview
                       </div>
                     </div>
-                    <div className="text-sm text-slate-300">
+                    <div className="text-xs text-slate-300 text-center sm:text-right">
                       Last refreshed: {metrics.lastUpdated}
                     </div>
                   </div>
 
-                  <div style={{ height: 320 }}>
+                  <div className="h-[300px] sm:h-[340px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={trendData}>
                         <XAxis dataKey="day" stroke="#6b7280" />
                         <YAxis stroke="#6b7280" />
-                        <Tooltip
-                          wrapperStyle={{
-                            background: "#0b1220",
-                            borderRadius: 8,
-                          }}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="avg"
-                          stroke={NEON.purple}
-                          strokeWidth={3}
-                          dot={{ r: 4, stroke: "#fff", fill: NEON.purple }}
-                        />
+                        <Tooltip wrapperStyle={{ background: "#0b1220", borderRadius: 8 }} />
+                        <Line type="monotone" dataKey="avg" stroke={NEON.purple} strokeWidth={3} dot={{ r: 4, stroke: "#fff", fill: NEON.purple }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -338,16 +246,16 @@ export default function FuturisticWeatherDashboard() {
 
                 <aside className="space-y-6">
                   {/* Pie Chart */}
-                  <div className="bg-gradient-to-tr from-[#041226] to-[#08102a] border border-white/6 rounded-2xl p-4 shadow-[0_18px_48px_rgba(3,6,23,0.6)]">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-white font-semibold">
+                  <div className="bg-gradient-to-tr from-[#041226] to-[#08102a] border border-white/10 rounded-2xl p-4 shadow-xl">
+                    <div className="flex flex-col sm:flex-row items-center justify-between mb-3 gap-1">
+                      <div className="text-white font-semibold text-center sm:text-left">
                         Condition Split
                       </div>
-                      <div className="text-xs text-slate-400">
+                      <div className="text-xs text-slate-400 text-center sm:text-right">
                         Proportion of tracked cities
                       </div>
                     </div>
-                    <div style={{ height: 220 }}>
+                    <div className="h-[220px] sm:h-[260px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
@@ -362,58 +270,34 @@ export default function FuturisticWeatherDashboard() {
                             }
                           >
                             {metrics.conditionSplit.map((_, i) => {
-                              const colors = [
-                                NEON.purple,
-                                NEON.cyan,
-                                NEON.pink,
-                                NEON.yellow,
-                              ];
-                              return (
-                                <Cell
-                                  key={`c-${i}`}
-                                  fill={colors[i % colors.length]}
-                                />
-                              );
+                              const colors = [NEON.purple, NEON.cyan, NEON.pink, NEON.yellow];
+                              return <Cell key={i} fill={colors[i % colors.length]} />;
                             })}
                           </Pie>
-                          <Tooltip
-                            wrapperStyle={{
-                              background: "#071126",
-                              borderRadius: 8,
-                            }}
-                          />
+                          <Tooltip wrapperStyle={{ background: "#071126", borderRadius: 8 }} />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
 
-                  {/* Top Cities Snapshot */}
-                  <div className="bg-gradient-to-tr from-[#041226] to-[#08102a] border border-white/6 rounded-2xl p-4 shadow-[0_18px_48px_rgba(3,6,23,0.6)]">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-white font-semibold">
+                  {/* Top Cities */}
+                  <div className="bg-gradient-to-tr from-[#041226] to-[#08102a] border border-white/10 rounded-2xl p-4 shadow-xl">
+                    <div className="flex flex-col sm:flex-row items-center justify-between mb-3 gap-1">
+                      <div className="text-white font-semibold text-center sm:text-left">
                         Top Cities Snapshot
                       </div>
-                      <div className="text-xs text-slate-400">
+                      <div className="text-xs text-slate-400 text-center sm:text-right">
                         Quick glance
                       </div>
                     </div>
                     <div className="space-y-3">
                       {topCities.map((c, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between"
-                        >
+                        <div key={idx} className="flex items-center justify-between">
                           <div>
-                            <div className="text-white font-medium">
-                              {c.name}
-                            </div>
-                            <div className="text-xs text-slate-400">
-                              {c.cond}
-                            </div>
+                            <div className="text-white font-medium">{c.name}</div>
+                            <div className="text-xs text-slate-400">{c.cond}</div>
                           </div>
-                          <div className="text-white font-semibold">
-                            {c.temp}°C
-                          </div>
+                          <div className="text-white font-semibold">{c.temp}°C</div>
                         </div>
                       ))}
                     </div>
@@ -424,9 +308,8 @@ export default function FuturisticWeatherDashboard() {
           )
         )}
 
-        <footer className="mt-10 text-center text-slate-400 text-sm">
-          © {new Date().getFullYear()} Weather Dashboard — Built with ❤️ by
-          Niranjan
+        <footer className="mt-10 text-center text-slate-400 text-xs sm:text-sm">
+          © {new Date().getFullYear()} Weather Dashboard — Built with ❤️ by Niranjan
         </footer>
       </div>
     </div>
